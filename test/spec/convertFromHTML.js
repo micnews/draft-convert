@@ -220,6 +220,13 @@ describe('convertFromHTML', () => {
     expect(convertToHTML(contentState)).toBe('<p>one<br/>two</p>');
   });
 
+  it('DOESNT convert br tag to block boundaries with four items', () => {
+    const html = '<p>one<br/>two<br/>three<br/>four</p>';
+    const contentState = toContentState(html);
+    expect(contentState.getBlocksAsArray().length).toBe(1);
+    expect(convertToHTML(contentState)).toBe('<p>one<br/>two<br/>three<br/>four</p>');
+  });
+
   it('converts multiple consecutive brs', () => {
     const html = '<p>one<br/><br/>two</p>';
     const contentState = toContentState(html);
@@ -380,6 +387,14 @@ describe('convertFromHTML', () => {
     blocks.forEach(block => {
       expect(block.getType()).toBe('unstyled');
     });
+  });
+
+  it('unescapes HTML encoded characters in text and converts them back', () => {
+    const html = '<p>test&amp;</p>';
+    const contentState = toContentState(html);
+    expect(contentState.getPlainText()).toBe('test&');
+    const resultHTML = convertToHTML(contentState);
+    expect(resultHTML).toBe(html);
   });
 
   it('handles nested blocks in blockquote', () => {
